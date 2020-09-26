@@ -45,6 +45,7 @@
     (with-local-vars [list-of-in [] list-of-out '() list-of-node '[]]
       ;; width: the number of cells on the X axis
       ;; height: the number of cells on the Y axis
+      (debug (str "# PERF INIT: " (.getTime (java.util.Date.)) ))
       (loop [i 0]
         (when (< i height)
           (let [line (into [] (clojure.string/split (read-line) #"" ))]
@@ -59,6 +60,8 @@
               (recur (inc j))))
             (recur (inc i)))))
 
+      (debug (str "# PERF PARSED: " (.getTime (java.util.Date.)) ))
+
       ;; (debug "Debug messages...")
       ;; (debug (var-get list-of-node))
       (var-set list-of-out
@@ -68,11 +71,16 @@
                       (format-node (getDoValue (var-get list-of-node) node))
                       )
                  ))
-      (doseq [out (var-get list-of-out)]
-        (debug out))
+      ;; (doseq [out (var-get list-of-out)]
+      ;;   (debug out))
+
+      (debug (str "# PERF BUILDED: " (.getTime (java.util.Date.)) ))
 
       (doseq [out (var-get list-of-out)]
         (output out))
+      (debug (str "# PERF ENDED: " (.getTime (java.util.Date.))))
 
       ;; Three coordinates: a node, its right neighbor, its bottom neighbor
       )))
+
+(-main)
