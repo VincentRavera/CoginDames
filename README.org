@@ -1,0 +1,10 @@
+#+TITLE: Readme
+
+* Run Perf Test
+Units displayed are miliseconds.
+** No Spoon
+#+BEGIN_SRC bash
+cd ./perf/no-spoon
+bash run_tests.bash # might take time
+bash parse-log.bash
+#+END_SRC
