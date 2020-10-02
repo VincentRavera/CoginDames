@@ -29,12 +29,16 @@ func convertSpeedMS2KH(speed float64) int {
  *  --------ok=============
  */
 func trigoSolveError(amplitude float64) bool {
-	error := 1e-13
-	if math.Abs(amplitude) < error {
-		amplitude = 0
-	}
+	// error := 1e-14
+	error := 9.554722e-15
+	// error := 0.0
 
 	fmt.Fprintf(os.Stderr, "Amp is: %e\n", amplitude)
+	if math.Abs(amplitude) < error {
+		amplitude = 0
+		fmt.Fprintf(os.Stderr, "  `->0\n")
+	}
+
 	if amplitude >= 0 {
 		return true
 	}
@@ -42,19 +46,19 @@ func trigoSolveError(amplitude float64) bool {
 
 }
 
-func trigoSolve(speed float64, distance int, duration int) bool {
-	di := float64(distance)
-	ti := float64(duration)
-	time_spent := di / speed
-	amplitude := math.Sin(math.Pi*time_spent/ti)
+func trigoSolve(speed int, distance int, duration int) bool {
+	// di := float64(distance)
+	// ti := float64(duration)
+	// time_spent := di / speed
+	amplitude := math.Sin(math.Pi*float64(distance)/float64(speed)/float64(duration)/1000.0*3600.0)
 	if trigoSolveError(amplitude) {
 		return true
 	}
-	fmt.Fprintf(os.Stderr, "Failed for speed %f:\n->ti:%f\n->ts:%f\n->amp:%e\n", speed, ti, time_spent, amplitude)
+	fmt.Fprintf(os.Stderr, "Failed for speed %d:\n->ti:%d\n->amp:%e\n", speed, duration, amplitude)
 	return false
 }
 
-func solve(speed float64, lightCount int, distances []int, durations []int) bool {
+func solve(speed int, lightCount int, distances []int, durations []int) bool {
 	for i := 0; i < lightCount; i++ {
 		passed := trigoSolve(speed, distances[i], durations[i])
 		if !passed {
@@ -87,8 +91,8 @@ func main() {
 	//Solve
 	for i := khMaxSpeed; i > 0 ; i-- {
 		fmt.Fprintf(os.Stderr, "Testing %d kh/h\n", i)
-		current_speed := convertSpeedKH2MS(i)
-		all_passed := solve(current_speed, lightCount, distances, durations)
+		// current_speed := convertSpeedKH2MS(i)
+		all_passed := solve(i, lightCount, distances, durations)
 		if all_passed {
 			fmt.Println(i)
 			fmt.Fprintf(os.Stderr, "Found for speed %d\n", i)
