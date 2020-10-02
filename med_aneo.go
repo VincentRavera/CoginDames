@@ -23,15 +23,34 @@ func convertSpeedMS2KH(speed float64) int {
 
 }
 
+/*
+ *         -e    0   +e
+ *  --------[----|----]----
+ *  --------ok=============
+ */
+func trigoSolveError(amplitude float64) bool {
+	error := 1e-13
+	if math.Abs(amplitude) < error {
+		amplitude = 0
+	}
+
+	fmt.Fprintf(os.Stderr, "Amp is: %e\n", amplitude)
+	if amplitude >= 0 {
+		return true
+	}
+	return false
+
+}
+
 func trigoSolve(speed float64, distance int, duration int) bool {
 	di := float64(distance)
 	ti := float64(duration)
 	time_spent := di / speed
-	amplitude := math.Sin(2*math.Pi*time_spent/ti)
-	if amplitude >= 0 {
+	amplitude := math.Sin(math.Pi*time_spent/ti)
+	if trigoSolveError(amplitude) {
 		return true
 	}
-	fmt.Fprintf(os.Stderr, "Failed for speed %f:\n->ti:%f\n->ts:%f\n->amp:%f\n", speed, ti, time_spent, amplitude)
+	fmt.Fprintf(os.Stderr, "Failed for speed %f:\n->ti:%f\n->ts:%f\n->amp:%e\n", speed, ti, time_spent, amplitude)
 	return false
 }
 
